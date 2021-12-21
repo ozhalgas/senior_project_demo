@@ -180,9 +180,23 @@ class _HomeState extends State<Home> {
 }
 
 //Widget displaying Categories, which can be expanded
-class ExpandableWidget extends StatelessWidget {
+class ExpandableWidget extends StatefulWidget {
   const ExpandableWidget(this.category, this.shopIDList);
   final String category;
+  final List<String> shopIDList;
+
+  @override
+  State<ExpandableWidget> createState() => _ExpandableWidgetState(this.category, this.shopIDList);
+}
+
+class _ExpandableWidgetState extends State<ExpandableWidget> {
+
+  String category;
+  List<String> shopIDList;
+  late Future shopFuture;
+  late Map shopToInfoMap = new Map();
+
+  _ExpandableWidgetState(this.category, this.shopIDList);
 
    Future<ShopM> fetchShopInfo(String shopID) async{
     final url = Uri.parse("https://shopping-app-mega-silkway.herokuapp.com/shops/" + shopID);
@@ -190,14 +204,17 @@ class ExpandableWidget extends StatelessWidget {
     ShopM shop = ShopM.fromJson(json.decode(response.body));
     return shop;
   }
-  //final List<String> shopIDList;
 
-  //final Categorie categorie;
-  final List<String> shopIDList;
+  void initState(){
+    super.initState();
+    for(String shopID in shopIDList){
+      shopToInfoMap[shopID] = fetchShopInfo(shopID);
+    }
+  }
 
   showShop(BuildContext context, String shopID){
     return FutureBuilder<ShopM>(
-      future: fetchShopInfo(shopID),
+      future: shopToInfoMap[shopID],
       builder: (context, snapshot){
         if(snapshot.data != null){
           final shop = snapshot.data;
@@ -237,16 +254,16 @@ class ExpandableWidget extends StatelessWidget {
       ),
       child: ExpansionTile(
         //backgroundColor: Color(0xff68B0AB),
-        key: PageStorageKey<String>(category),
+        key: PageStorageKey<String>(widget.category),
         title: Text(
-          category,
+          widget.category,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Color(0xffF5F6FA),
           ),
         ),
-        children: shopIDList.map<Widget>((shopID) => showShop(context, shopID)).toList(),
+        children: widget.shopIDList.map<Widget>((shopID) => showShop(context, shopID)).toList(),
       ),
     );
   }
