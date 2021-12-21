@@ -1,13 +1,13 @@
-class Shop {
+class ShopM {
   late String shopName;
   late String shopCategory;
   late String shopDescription;
   late String shopImage;
 
-  Shop(
+  ShopM(
       {required this.shopName,required this.shopCategory,required this.shopDescription,required this.shopImage});
 
-  Shop.fromJson(Map<String, dynamic> json) {
+  ShopM.fromJson(Map<String, dynamic> json) {
     shopName = json['shop_name'];
     shopCategory = json['shop_category'];
     shopDescription = json['shop_description'];

@@ -10,7 +10,7 @@ import 'package:senior_project_demo/screens/map_screen.dart';
 import 'package:senior_project_demo/data.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:senior_project_demo/model/categories.dart';
-//import 'package:senior_project_demo/model/shop.dart';
+import 'package:senior_project_demo/model/shop_m.dart';
 import 'package:senior_project_demo/model/category_shops.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -183,28 +183,47 @@ class _HomeState extends State<Home> {
 class ExpandableWidget extends StatelessWidget {
   const ExpandableWidget(this.category, this.shopIDList);
   final String category;
+
+   Future<ShopM> fetchShopInfo(String shopID) async{
+    final url = Uri.parse("https://shopping-app-mega-silkway.herokuapp.com/shops/" + shopID);
+    final response = await http.get(url);
+    ShopM shop = ShopM.fromJson(json.decode(response.body));
+    return shop;
+  }
   //final List<String> shopIDList;
 
   //final Categorie categorie;
   final List<String> shopIDList;
 
   showShop(BuildContext context, String shopID){
-    return new ListTile(
-      title: Text(
-        shopID,
-        style: TextStyle(
-          fontSize: 20,
-          color: Color(0xffF5F6FA),
-        ),
-      ),
-      onTap: () {
-        /*Navigator.push(
-          context, 
-          MaterialPageRoute(
-            builder: (context) => MapScreen(shop: shop),
+    return FutureBuilder<ShopM>(
+      future: fetchShopInfo(shopID),
+      builder: (context, snapshot){
+        if(snapshot.data != null){
+          final shop = snapshot.data;
+          return new ListTile(
+            title: Text(
+              shop!.shopName,
+              style: TextStyle(
+                fontSize: 20,
+                color: Color(0xffF5F6FA),
+              ),
+            ),
+            onTap: () {
+              /*Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (context) => MapScreen(shop: shop),
+                ),
+              );*/
+            },
+          );
+        }else return Container(
+          child: Center(
+            child: Text("Loading..."),
           ),
-        );*/
-      },
+        );
+      }, 
     );
   }
 
