@@ -48,6 +48,7 @@ class _MapScreenState extends State<MapScreen> {
           child: Column(
             children: [
               SizedBox(height:300),
+              //VOT MESTO 
               Text(
                 'Map will be here',
                 style: TextStyle(
