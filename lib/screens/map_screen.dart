@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:senior_project_demo/data.dart';
 import 'package:senior_project_demo/widgets/panel_widget.dart';
 import 'package:senior_project_demo/widgets/panel_widget_one.dart';
+import 'package:senior_project_demo/model/shop_m.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({ Key? key, required this.shop}) : super(key: key);
 
-  final Shop shop;
+  final ShopM shop;
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -72,7 +73,7 @@ class _MapScreenState extends State<MapScreen> {
         appBar: buildTabBar(),
         body: TabBarView(
           children: [
-            PanelWidget(
+            /*PanelWidget(
               controller: controller,
               //panelController: panelController,
               shop: widget.shop,
@@ -81,7 +82,7 @@ class _MapScreenState extends State<MapScreen> {
               controller: controller,
               //panelController: panelController,
               shop: widget.shop,
-            ),
+            ),*/
           ],
         ),
       ),
@@ -92,7 +93,8 @@ class _MapScreenState extends State<MapScreen> {
     return AppBar(
       automaticallyImplyLeading: false,
       title: Text(
-        widget.shop.name,
+        //widget.shop.name,
+        "Testing Now",
         style: TextStyle(
           fontSize: 30.0,
           color: Colors.black,

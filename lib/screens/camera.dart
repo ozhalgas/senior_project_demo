@@ -64,12 +64,12 @@ class _CameraState extends State<Camera> {
         scale: 1.5,
         child: FloatingActionButton(
           onPressed: (){
-            Navigator.pushReplacement(
+            /*Navigator.pushReplacement(
               context, 
               MaterialPageRoute(
                 builder: (context) => MapScreen(shop: Shop('Basconi', 'Description of Basconi', '2')),
               ),
-            );
+            );*/
           },
           foregroundColor: primaryColor,
           child: const Icon(

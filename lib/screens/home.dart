@@ -51,6 +51,33 @@ class _HomeState extends State<Home> {
     //}else return CategoryShops();
   }
 
+  Future<ShopM> fetchShopFromPhoto() async{
+    try{
+      String filename = this.img!.path.split('/').last;
+      FormData formData = new FormData.fromMap({
+        'file': await MultipartFile.fromFile(this.img!.path, filename: filename, contentType: new MediaType('image', 'jpeg')),
+      });
+
+      dio.post(
+        'https://shopping-app-mega-silkway.herokuapp.com/photos/',
+        data: formData,
+        options: Options(
+          headers: {"Content-Type": "multipart/form-data"},
+          method: 'POST',
+          responseType: ResponseType.json,
+        )
+      ).then((response){
+        //print(response);
+        ShopM shop = ShopM.fromJson(json.decode(response.toString()));
+        print(response.toString());
+        return shop;
+      }).catchError((error) => print(error));
+    }catch(e){
+      print(e);
+    }
+    return ShopM.fromJson(json.decode(""));
+  }
+
   Future pickImage(BuildContext context, source) async {
     try{
       final nav = Navigator.of(context);
@@ -60,29 +87,14 @@ class _HomeState extends State<Home> {
         setState((){
           this.img = img;
         });
-        try{
-          String filename = this.img!.path.split('/').last;
-          FormData formData = new FormData.fromMap({
-            'file': await MultipartFile.fromFile(this.img!.path, filename: filename, contentType: new MediaType('image', 'jpeg')),
-          });
-
-          dio.post(
-            'https://shopping-app-mega-silkway.herokuapp.com/photos/',
-            data: formData,
-            options: Options(
-              headers: {"Content-Type": "multipart/form-data"},
-              method: 'POST',
-              responseType: ResponseType.json,
-            )
-          ).then((response) => print(response)).catchError((error) => print(error));
-        }catch(e){
-          print(e);
-        }
-        await nav.push(
+        //ShopM shop = fetchShopFromPhoto() as ShopM;
+        Future<ShopM> shop1 = fetchShopFromPhoto();
+        /*await nav.push(
           MaterialPageRoute(
-            builder: (context) => MapScreen(shop: Shop('Summit Sport', 'Australian sportswear and sports equipment shop. It focuses on delivering ‘Best-In-Game’ products.', '2')),
+            //builder: (context) => MapScreen(shop: Shop('Summit Sport', 'Australian sportswear and sports equipment shop. It focuses on delivering ‘Best-In-Game’ products.', '2')),
+            builder: (context) => MapScreen(shop: shop),
           ),
-        );
+        );*/
       }
     }on PlatformException catch(e){
       print("Failed to print image: $e");  
@@ -334,12 +346,12 @@ class ShopSearch extends SearchDelegate<String>{
       body: ListView.builder(
         itemBuilder: (context, index) => ListTile(
           onTap: (){
-            Navigator.pushReplacement(
+            /*Navigator.pushReplacement(
               context, 
               MaterialPageRoute(
                 builder: (context) => MapScreen(shop: suggestionList[index])
               ),
-            );
+            );*/
           },
           leading: Icon(
             Icons.local_grocery_store_outlined,
