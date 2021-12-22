@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -24,8 +26,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  File? img;
+  XFile? img;
   List<String> _categList = [];
+  Dio dio = new Dio();
 
   Future<List<String>> fetchCategList() async {
     final url = Uri.parse("https://shopping-app-mega-silkway.herokuapp.com/");
@@ -44,8 +47,6 @@ class _HomeState extends State<Home> {
     //if(response.statusCode == 200){
       //List<String> shopIDList = CategoryShops.fromJson(json.decode(response.body)).categoryShops;
       CategoryShops shops = CategoryShops.fromJson(json.decode(response.body));
-      //print(shopIDList);
-      //return shopIDList;
       return shops;
     //}else return CategoryShops();
   }
@@ -55,14 +56,33 @@ class _HomeState extends State<Home> {
       final nav = Navigator.of(context);
       final img = await ImagePicker().pickImage(source: source);
       if(img != null){
-        final imgTempPath = File(img.path);
-        print(imgTempPath);
+        //print(File(img.path));
+        setState((){
+          this.img = img;
+        });
+        try{
+          String filename = this.img!.path.split('/').last;
+          FormData formData = new FormData.fromMap({
+            'file': await MultipartFile.fromFile(this.img!.path, filename: filename, contentType: new MediaType('image', 'jpeg')),
+          });
+
+          dio.post(
+            'https://shopping-app-mega-silkway.herokuapp.com/photos/',
+            data: formData,
+            options: Options(
+              headers: {"Content-Type": "multipart/form-data"},
+              method: 'POST',
+              responseType: ResponseType.json,
+            )
+          ).then((response) => print(response)).catchError((error) => print(error));
+        }catch(e){
+          print(e);
+        }
         await nav.push(
           MaterialPageRoute(
             builder: (context) => MapScreen(shop: Shop('Summit Sport', 'Australian sportswear and sports equipment shop. It focuses on delivering ‘Best-In-Game’ products.', '2')),
           ),
         );
-        this.img = imgTempPath;
       }
     }on PlatformException catch(e){
       print("Failed to print image: $e");  
@@ -160,7 +180,7 @@ class _HomeState extends State<Home> {
               child: FloatingActionButton(
                 onPressed: (){
                   //Navigator.pushNamed(context, '/camera');
-                  pickImage(context, ImageSource.camera);
+                  pickImage(context, ImageSource.gallery);
                 },
                 foregroundColor: Color(0xffF5F6FA),
                 child: const Icon(
